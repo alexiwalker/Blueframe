@@ -2,14 +2,12 @@ import "dart:io";
 import 'package:blueframe/blueframe.dart';
 
 class Template {
-
-  Template({this.replacers, this.template, basePath}) {
-    if(basePath != "")
-      this.basePath+="$basePath\\";
+  Template({this.replacers, this.template, basePath, this.replaceIteratively}) {
+    if (basePath != "") this.basePath += "$basePath\\";
     try {
-    final File f = File("${this.basePath}$template");
-    _templateContents = f.readAsStringSync();
-    } catch (e){
+      final File f = File("${this.basePath}$template");
+      _templateContents = f.readAsStringSync();
+    } catch (e) {
       print(e.toString());
       _templateContents = "";
     }
@@ -25,9 +23,9 @@ class Template {
   String _templateContents;
   String basePath = "";
   String errString = "";
+  bool replaceIteratively = false;
 
   List<String> includedFiles = [];
-
 
   final RegExp includePattern = RegExp(r'({{@include\s\"[A-Za-z0-9.\\\/]+\"}})', caseSensitive: true);
   final RegExp includeOncePattern = RegExp(r'({{@includeonce\s\"[A-Za-z0-9.\\\/]+\"}})', caseSensitive: true);
@@ -38,7 +36,7 @@ class Template {
     this.replacers = replacers;
   }
 
-  void setViewRoute(String path){
+  void setViewRoute(String path) {
     basePath = path;
   }
 
@@ -46,8 +44,8 @@ class Template {
     this.template = template;
 
     try {
-    File f = File("$basePath/$this.template");
-    _templateContents = f.readAsStringSync();
+      final File file = File("$basePath/$this.template");
+      _templateContents = file.readAsStringSync();
     } catch (e) {
       print(e.toString());
 
@@ -63,7 +61,6 @@ class Template {
     for (var pair in replacers.entries) {
       final String key = pair.key;
       final String content = pair.value;
-      print(content);
       final String formatter = "(\\[\\[$key\\]\\])";
       _templateContents = _templateContents.replaceAllMapped(RegExp(formatter, caseSensitive: false), (Match m) => content);
     }
@@ -73,24 +70,24 @@ class Template {
   /// Attempts to replace all replacerfields so long as they exist
   /// this may be desired where the replcers list values itself contains more replacers, leaving [[field]] after the first pass
   ///
-  void forceReplacers() {
-    while (hasReplacers()){
-      var start = _templateContents;
+  void replaceIterative() {
+    String start;
+    while (hasReplacers()) {
+      start = _templateContents;
       for (var pair in replacers.entries) {
         final String key = pair.key;
         final String content = pair.value;
-        print(content);
         final String formatter = "(\\[\\[$key\\]\\])";
         _templateContents = _templateContents.replaceAllMapped(RegExp(formatter, caseSensitive: false), (Match m) => content);
       }
 
       //if a pass results in no change to the document, break the loop
-      if(_templateContents==start)
-        break;
+      //the while relies in [[field]] formatted statements, but if the key doesn't exist
+      //it will always return true, and would cause an inf loop if not a rtn or brk here
+      if (_templateContents == start)
+        return;
     }
-
   }
-
 
   ///
   /// currently directives only includes... includes
@@ -106,16 +103,13 @@ class Template {
   ///
   /// Format: {{@include "filename.js"}}
   ///
-  void runIncludes(){
+  void runIncludes() {
     while (hasIncludes()) {
       _templateContents = _templateContents.replaceAllMapped(includePattern, (Match m) {
-        print(m.group(0));
-        print(m.group(0));
         String filename = filenamesPattern.firstMatch(m.group(0)).group(0);
         filename = filename.replaceAll("\"", "");
         String fileContent;
         try {
-          print("$basePath$filename");
           final File file = File("$basePath$filename");
           fileContent = file.readAsStringSync();
         } catch (e) {
@@ -135,21 +129,19 @@ class Template {
   ///
   /// Format: {{@includeonce "filename.js"}}
   ///
-  void runIncludeOnce(){
+  void runIncludeOnce() {
     while (hasIncludeOnce()) {
       _templateContents = _templateContents.replaceAllMapped(includeOncePattern, (Match m) {
-
         String filename = filenamesPattern.firstMatch(m.group(0)).group(0);
         filename = filename.replaceAll("\"", "");
 
-        if(includedFiles.contains(filename))
+        if (includedFiles.contains(filename))
           return "";
         else
           includedFiles.add(filename);
 
         String fileContent;
         try {
-          print("$basePath$filename");
           final File file = File("$basePath$filename");
           fileContent = file.readAsStringSync();
         } catch (e) {
@@ -161,10 +153,9 @@ class Template {
     }
   }
 
-
   void appendFile(String filename) {
     try {
-      final File file = File( "$basePath/$filename");
+      final File file = File("$basePath/$filename");
       final String content = file.readAsStringSync();
       _templateContents += "\n$content";
     } catch (e) {
@@ -174,12 +165,13 @@ class Template {
   }
 
   bool hasIncludes() => includePattern.hasMatch(_templateContents);
+
   bool hasIncludeOnce() => includeOncePattern.hasMatch(_templateContents);
+
   bool hasReplacers() => replacersPattern.hasMatch(_templateContents);
 
-  void render(){
+  void render() {
+    replaceIteratively ? replaceIterative() : runReplacers();
     runDirectives();
-    runReplacers();
   }
-
 }
