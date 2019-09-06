@@ -20,7 +20,7 @@ class RouteDelegator {
     List<String> routeString = request.path.segments;
 
     if(routeString.isEmpty)
-      return homeRoute(request);
+      return HomeRoute(request);
 
     if(routeGetter.containsKey(routeString[0]))
       return routeGetter[routeString[0]](request);

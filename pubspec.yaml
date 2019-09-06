@@ -1,7 +1,7 @@
 name: blueframe
-description: An empty Aqueduct application.
+description: A higher level web framework built on top of Aqueduct.
 version: 0.0.1
-author: stable|kernel <jobs@stablekernel.com>
+author: Blue[] <alexander.i.walker@outlook.com>
 
 environment:
   sdk: ">=2.0.0 <3.0.0"

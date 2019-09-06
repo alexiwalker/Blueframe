@@ -26,3 +26,10 @@ class deniedRoute implements Route {
 		return Response.forbidden();
 	}
 }
+
+
+Response htmlResponse(String content){
+	final Response resp = Response.ok(content);
+	resp.contentType=ContentType.html;
+	return resp;
+}
