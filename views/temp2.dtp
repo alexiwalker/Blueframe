@@ -1,0 +1,3 @@
+<h1>template test</h1>
+
+{{@include "temp3.dtp"}}

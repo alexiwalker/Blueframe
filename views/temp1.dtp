@@ -1,0 +1,14 @@
+<!-- this include holds another include, which is also included (recursive include) -->
+
+{{@include "temp2.dtp"}}
+
+<h1> Hi </h1>
+
+
+<!-- [[body]] should be replaced by the replacer tag]] -->
+[[body]]
+
+
+<!-- this tag is deliberately not replaced-->
+[[NOTFILLINGTHISTAG]]
+
