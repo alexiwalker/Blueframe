@@ -3,6 +3,7 @@ import 'package:blueframe/blueframe.dart';
 
 class Template {
   Template({this.replacers, this.template, basePath, this.replaceIteratively}) {
+    this.replaceIteratively == null? replaceIteratively=false:this.replaceIteratively;
     if (basePath != "") this.basePath += "$basePath\\";
     try {
       final File f = File("${this.basePath}$template");
@@ -23,7 +24,7 @@ class Template {
   String _templateContents;
   String basePath = "";
   String errString = "";
-  bool replaceIteratively = false;
+  bool replaceIteratively;
 
   List<String> includedFiles = [];
 
@@ -171,6 +172,7 @@ class Template {
   bool hasReplacers() => replacersPattern.hasMatch(_templateContents);
 
   void render() {
+    print(replaceIteratively);
     replaceIteratively ? replaceIterative() : runReplacers();
     runDirectives();
   }

@@ -1,5 +1,11 @@
-import 'blueframe.dart';
+import 'dart:convert';
+
 import 'package:blueframe/Routes/RouteDelegator.dart';
+import 'blueframe.dart';
+import 'dart:io' as io;
+import 'package:path/path.dart' as path;
+import 'package:mime/mime.dart' as mime;
+
 /// This type initializes an application.
 ///
 /// Override methods in this class to set up routes and initialize services like
@@ -13,7 +19,8 @@ class BlueframeChannel extends ApplicationChannel {
   /// This method is invoked prior to [entryPoint] being accessed.
   @override
   Future prepare() async {
-    logger.onRecord.listen((rec) => print("$rec ${rec.error ?? ""} ${rec.stackTrace ?? ""}"));
+    logger.onRecord.listen(
+        (rec) => print("$rec ${rec.error ?? ""} ${rec.stackTrace ?? ""}"));
   }
 
   /// Construct the request channel.
@@ -25,25 +32,35 @@ class BlueframeChannel extends ApplicationChannel {
   @override
   Controller get entryPoint {
     final router = Router();
-
-    // Prefer to use `link` instead of `linkFunction`.
-    // See: https://aqueduct.io/docs/http/request_controller/
-//    router
-//      .route("/example")
-//      .linkFunction((request) async {
-//        return Response.ok({"key": "value"});
-//      });
+    router.route("/assets/*").link(() => FileController("assets/"));
 
     router.route("/*").linkFunction((request) async {
       return RouteDelegator(request).getRoute().getResponse();
     });
 
-    router.route("*/*.ico").link(() => FileController("assets/"));
+    router.route("*(.ico)").linkFunction((request)async{
+      try {
+      String filePath = "assets/${request.path.segments.join("/")}";
+      final file = File(filePath);
+      final fileContents = file.readAsBytesSync();
+      final contentType = mime.lookupMimeType(filePath);
+      return Response.ok(fileContents)
+        ..contentType = io.ContentType.parse(contentType);
+      } catch (e){
+        return Response.notFound();
+      }
+    });
 
-    router.route("/assets/*").link(() => FileController("assets/"));
-    router.route("/asset/*").link(() => FileController("assets/"));
-
-
+    router.route("*(.js)").linkFunction((request) async {
+      try{
+        final f = File("js/${request.path.segments.join("/")}");
+      return Response.ok(
+          f.readAsBytesSync())
+        ..contentType = io.ContentType.parse(mime.lookupMimeType(f.path));
+      } catch (e) {
+        return Response.notFound();
+      }
+    });
 
     return router;
   }

@@ -1,0 +1,3 @@
+{{@includeonce "components.dhml"}}
+
+<body>Hi</body>

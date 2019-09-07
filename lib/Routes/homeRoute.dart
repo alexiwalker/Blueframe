@@ -14,7 +14,7 @@ class HomeRoute extends Route{
 	};
 
   	final Template template = Template(
-	    template: "home.dtp",
+	    template: "home.dhml",
 	    replacers: map,
 	    basePath: "views"
     )..render();
