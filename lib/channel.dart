@@ -40,7 +40,7 @@ class BlueframeChannel extends ApplicationChannel {
 
     router.route("*(.ico)").linkFunction((request)async{
       try {
-      String filePath = "assets/${request.path.segments.join("/")}";
+      final String filePath = "assets/${request.path.segments.join("/")}";
       final file = File(filePath);
       final fileContents = file.readAsBytesSync();
       final contentType = mime.lookupMimeType(filePath);
