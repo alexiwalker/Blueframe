@@ -1,10 +1,7 @@
-import 'dart:convert';
 
 import 'package:blueframe/Routes/RouteDelegator.dart';
 import 'blueframe.dart';
-import 'dart:io' as io;
-import 'package:path/path.dart' as path;
-import 'package:mime/mime.dart' as mime;
+import 'support/fileHandlers.dart';
 
 /// This type initializes an application.
 ///
@@ -34,33 +31,11 @@ class BlueframeChannel extends ApplicationChannel {
     final router = Router();
     router.route("/assets/*").link(() => FileController("assets/"));
 
-    router.route("/*").linkFunction((request) async {
-      return RouteDelegator(request).getRoute().getResponse();
-    });
+    router.route("/*").linkFunction((request) => RouteDelegator(request).getRoute().getResponse());
 
-    router.route("*(.ico)").linkFunction((request)async{
-      try {
-      final String filePath = "assets/${request.path.segments.join("/")}";
-      final file = File(filePath);
-      final fileContents = file.readAsBytesSync();
-      final contentType = mime.lookupMimeType(filePath);
-      return Response.ok(fileContents)
-        ..contentType = io.ContentType.parse(contentType);
-      } catch (e){
-        return Response.notFound();
-      }
-    });
+    router.route("*(.ico)").linkFunction(getIcoFile);
 
-    router.route("*(.js)").linkFunction((request) async {
-      try{
-        final f = File("js/${request.path.segments.join("/")}");
-      return Response.ok(
-          f.readAsBytesSync())
-        ..contentType = io.ContentType.parse(mime.lookupMimeType(f.path));
-      } catch (e) {
-        return Response.notFound();
-      }
-    });
+    router.route("*(.js)").linkFunction(getJsMinFile);
 
     return router;
   }

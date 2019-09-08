@@ -1,6 +1,19 @@
-console.log('compile test')
+class example {
+    a:number;
+    constructor(a:number){
+        this.a = a;
+    }
+    speak(){
+        console.log(this.a)
+    }
 
-let a:String = String("abced");
-let b:number = 2;
-console.log(a);
-console.log(b);
+    changeVar(a:number){
+        this.a = a;
+        console.log('changed');
+    }
+
+    decr(){
+        this.a--;
+        console.log('decr');
+    }
+}
