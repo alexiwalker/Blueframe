@@ -4,7 +4,7 @@ import 'package:mime/mime.dart' as mime;
 
 Future<Response> getJsMinFile(Request request)async {
   try{
-    String path = "js-min/${request.path.segments.join("/")}";
+    String path = "js/js-min/${request.path.segments.join("/")}";
     path = path.replaceAll(".js", ".min.js");
     final f = File(path);
     return Response.ok(

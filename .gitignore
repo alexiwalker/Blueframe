@@ -13,4 +13,4 @@ Dart_Packages.xml
 .idea/
 *.aqueduct.pid
 js/*.js
-js-min/*.js
+js/js-min/*.js
