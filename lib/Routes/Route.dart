@@ -5,10 +5,11 @@ abstract class Route {
 	Future<Response> getResponse();
 }
 
-class badRoute implements Route {
-	Request request;
+class BadRoute implements Route {
 
-	badRoute(this.request);
+	BadRoute(this.request);
+
+	Request request;
 
 	@override
 	Future<Response> getResponse() async {
@@ -16,20 +17,22 @@ class badRoute implements Route {
 	}
 }
 
-class deniedRoute implements Route {
+class DeniedRoute implements Route {
+	DeniedRoute(this.request);
+
 	Request request;
 
-	deniedRoute(this.request);
-
 	@override
-	Future<Response> getResponse() async  {
+	Future<Response> getResponse() async {
 		return Response.forbidden();
 	}
 }
 
 
-Response htmlResponse(String content){
+Response htmlResponse(String content) {
+	//Shorter & reusable way to set a proper html response
+	//any other changes can be made to the Response object returned from here
 	final Response resp = Response.ok(content);
-	resp.contentType=ContentType.html;
+	resp.contentType = ContentType.html;
 	return resp;
 }

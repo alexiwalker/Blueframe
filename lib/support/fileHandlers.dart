@@ -2,28 +2,37 @@ import 'package:blueframe/blueframe.dart';
 import 'dart:io' as io;
 import 'package:mime/mime.dart' as mime;
 
-Future<Response> getJsMinFile(Request request)async {
-  try{
-    String path = "js/js-min/${request.path.segments.join("/")}";
-    path = path.replaceAll(".js", ".min.js");
-    final f = File(path);
-    return Response.ok(
-        f.readAsBytesSync())
-      ..contentType = io.ContentType.parse(mime.lookupMimeType(f.path));
-  } catch (e) {
-    return Response.notFound();
-  }
-}
+class FileHandlers {
+// ignore: non_constant_identifier_names
+	static Future<Response> JsMin(Request request) async =>
+		await getFileResponse(
+			"js/js-min/${request.path.segments.join("/").replaceFirst(
+				".js", ".min.js")}");
 
-Future<Response> getIcoFile(Request request) async {
-  try {
-    final String filePath = "assets/${request.path.segments.join("/")}";
-    final file = File(filePath);
-    final fileContents = file.readAsBytesSync();
-    final contentType = mime.lookupMimeType(filePath);
-    return Response.ok(fileContents)
-      ..contentType = io.ContentType.parse(contentType);
-  } catch (e){
-    return Response.notFound();
-  }
+// ignore: non_constant_identifier_names
+	static Future<Response> Js(Request request) async =>
+		await getFileResponse("js/js/${request.path.segments.join("/")}");
+
+// ignore: non_constant_identifier_names
+	static Future<Response> Css(Request request) async =>
+		await getFileResponse("assets/css/${request.path.segments.join("/")}");
+
+// ignore: non_constant_identifier_names
+	static Future<Response> Ico(Request request) async =>
+		await getFileResponse("assets/${request.path.segments.join("/")}");
+
+	static Future<Response> getFileResponse(String path) async {
+		try {
+			final file = File(path);
+			final fileContents = await file.readAsBytes();
+			final contentType = mime.lookupMimeType(path);
+			return Response.ok(fileContents)
+				..contentType = io.ContentType.parse(contentType);
+		} catch (e) {
+			print(e);
+			return Response.notFound();
+		}
+	}
+
+
 }

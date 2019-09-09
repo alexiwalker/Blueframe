@@ -9,26 +9,25 @@ export "Route.dart";
 
 class RouteDelegator {
 
-  RouteDelegator(this.request);
+	RouteDelegator(this.request);
 
-  static const Map<String,Route Function(Request)> routeGetter = {
-    "api":Api.getApi,
-  };
+	static const Map<String, Route Function(Request)> routeGetter = {
+		"api": Api.getApi,
+	};
 
-  Route getRoute() {
+	Route getRoute() {
+		final List<String> routeString = request.path.segments;
 
-    List<String> routeString = request.path.segments;
+		if (routeString.isEmpty)
+			return HomeRoute(request);
 
-    if(routeString.isEmpty)
-      return HomeRoute(request);
+		if (routeGetter.containsKey(routeString[0]))
+			return routeGetter[routeString[0]](request);
 
-    if(routeGetter.containsKey(routeString[0]))
-      return routeGetter[routeString[0]](request);
+		return BadRoute(request);
+	}
 
-    return badRoute(request);
-  }
-
-  Request request;
+	Request request;
 
 }
 

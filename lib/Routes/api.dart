@@ -5,19 +5,18 @@ import 'api/ping.dart';
 
 class Api {
 
-	static const Map<String,Route Function(Request)> routeGetter = {
-		"ping":Ping.getRoute
+	static const Map<String, Route Function(Request)> routeGetter = {
+		"ping": Ping.getRoute
 	};
 
 
-	static Route getApi(Request request){
-		print('hi');
-		List<String> segments = request.path.segments;
+	static Route getApi(Request request) {
+		final List<String> segments = request.path.segments;
 
-		if(!routeGetter.containsKey(segments[1]))
-			return badRoute(request);
+		if (!routeGetter.containsKey(segments[1]))
+			return BadRoute(request);
 
-		Route Function(Request) routingFunction = routeGetter[segments[1]];
+		final Route Function(Request) routingFunction = routeGetter[segments[1]];
 		final Route route = routingFunction(request);
 
 		return route;
