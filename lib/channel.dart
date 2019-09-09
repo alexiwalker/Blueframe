@@ -26,7 +26,7 @@ class BlueframeChannel extends ApplicationChannel {
 	/// of all [Request]s.
 	///
 	/// This method is invoked after [prepare].
-	bool isDev = true;
+	bool useMin = false;
 
 	@override
 	Controller get entryPoint {
@@ -39,10 +39,10 @@ class BlueframeChannel extends ApplicationChannel {
 		router.route("*(.ico)").linkFunction(FileHandlers.Ico);
 
 		//if dev, use non minified JS for debugging. Use JsMin for prod
-		if (isDev)
-			router.route("*(.js)").linkFunction(FileHandlers.Js);
-		else
+		if (useMin)
 			router.route("*(.js)").linkFunction(FileHandlers.JsMin);
+		else
+			router.route("*(.js)").linkFunction(FileHandlers.Js);
 
 		router.route("*(.css)").linkFunction(FileHandlers.Css);
 
