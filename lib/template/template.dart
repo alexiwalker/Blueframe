@@ -3,7 +3,9 @@ import 'package:blueframe/blueframe.dart';
 
 class Template {
 	Template({this.replacers, this.template, basePath, this.replaceIteratively}) {
-		this.replaceIteratively == null ? replaceIteratively = false : this.replaceIteratively;
+		replaceIteratively == null
+			? replaceIteratively = false
+			: replaceIteratively;
 		if (basePath != "")
 			this.basePath += "$basePath\\";
 
@@ -35,6 +37,12 @@ class Template {
 	final RegExp replacersPattern = RegExp(r'(\[\[[A-Za-z0-9]+]\])', caseSensitive: true);
 	final RegExp filenamesPattern = RegExp(r'(\"[A-Za-z0-9.\\\/]+\")', caseSensitive: true);
 
+	final RegExp inlineJSPattern = RegExp(r'({{@JS\s\"[A-Za-z0-9.\\\/]+\"}})', caseSensitive: true);
+	final RegExp inlineCSSPattern = RegExp(r'({{@CSS\s\"[A-Za-z0-9.\\\/]+\"}})', caseSensitive: true);
+
+	final RegExp includeJSPattern = RegExp(r'({{@linkJS\s\"[A-Za-z0-9.\\\/]+\"}})', caseSensitive: true);
+	final RegExp includeCSSPattern = RegExp(r'({{@linkCSS\s\"[A-Za-z0-9.\\\/]+\"}})', caseSensitive: true);
+
 	void setReplacers(Map<String, String> replacers) {
 		this.replacers = replacers;
 	}
@@ -65,7 +73,8 @@ class Template {
 			final String key = pair.key;
 			final String content = pair.value;
 			final String formatter = "(\\[\\[$key\\]\\])";
-			_templateContents = _templateContents.replaceAllMapped(RegExp(formatter, caseSensitive: false), (Match m) => content);
+			_templateContents = _templateContents.replaceAllMapped(
+				RegExp(formatter, caseSensitive: false), (Match m) => content);
 		}
 	}
 
@@ -81,14 +90,14 @@ class Template {
 				final String key = pair.key;
 				final String content = pair.value;
 				final String formatter = "(\\[\\[$key\\]\\])";
-				_templateContents = _templateContents.replaceAllMapped(RegExp(formatter, caseSensitive: false), (Match m) => content);
+				_templateContents = _templateContents.replaceAllMapped(
+					RegExp(formatter, caseSensitive: false), (Match m) => content);
 			}
 
 			//if a pass results in no change to the document, break the loop
 			//the while relies in [[field]] formatted statements, but if the key doesn't exist
 			//it will always return true, and would cause an inf loop if not a rtn or brk here
-			if (_templateContents == start)
-				return;
+			if (_templateContents == start) return;
 		}
 	}
 
@@ -101,26 +110,33 @@ class Template {
 	void runDirectives() {
 		runIncludes();
 		runIncludeOnce();
+		runInlineJS();
+		runInlineCSS();
+		runIncludeCSS();
+		runIncludeJS();
 	}
+
 
 	///
 	/// Format: {{@include "filename.js"}}
 	///
 	void runIncludes() {
 		while (hasIncludes()) {
-			_templateContents = _templateContents.replaceAllMapped(includePattern, (Match m) {
-				String filename = filenamesPattern.firstMatch(m.group(0)).group(0);
-				filename = filename.replaceAll("\"", "");
-				String fileContent;
-				try {
-					final File file = File("$basePath$filename");
-					fileContent = file.readAsStringSync();
-				} catch (e) {
-					print(e.toString());
-					return errString;
-				}
-				return fileContent;
-			});
+			_templateContents =
+				_templateContents.replaceAllMapped(includePattern, (Match m) {
+					String filename = filenamesPattern.firstMatch(m.group(0))
+						.group(0);
+					filename = filename.replaceAll("\"", "");
+					String fileContent;
+					try {
+						final File file = File("$basePath$filename");
+						fileContent = file.readAsStringSync();
+					} catch (e) {
+						print(e.toString());
+						return errString;
+					}
+					return fileContent;
+				});
 		}
 	}
 
@@ -134,8 +150,10 @@ class Template {
 	///
 	void runIncludeOnce() {
 		while (hasIncludeOnce()) {
-			_templateContents = _templateContents.replaceAllMapped(includeOncePattern, (Match m) {
-				String filename = filenamesPattern.firstMatch(m.group(0)).group(0);
+			_templateContents = _templateContents.replaceAllMapped(
+				includeOncePattern, (Match m) {
+				String filename = filenamesPattern.firstMatch(m.group(0)).group(
+					0);
 				filename = filename.replaceAll("\"", "");
 
 				if (includedFiles.contains(filename))
@@ -156,6 +174,72 @@ class Template {
 		}
 	}
 
+	void runInlineJS() {
+		while (hasJS()) {
+			_templateContents =
+				_templateContents.replaceAllMapped(inlineJSPattern, (Match m) {
+					String filename = filenamesPattern.firstMatch(m.group(0))
+						.group(0);
+					filename = filename.replaceAll("\"", "");
+					String fileContent;
+					try {
+						final File file = File("js/js-min/$filename");
+						fileContent = file.readAsStringSync();
+						StringBuffer sb = StringBuffer();
+						sb.write("<script type='application/javascript'></br>");
+						sb.write(fileContent);
+						sb.write("</br></script>");
+					} catch (e) {
+						print(e.toString());
+						return errString;
+					}
+					return fileContent;
+				});
+		}
+	}
+
+	void runInlineCSS() {
+		_templateContents =
+			_templateContents.replaceAllMapped(inlineCSSPattern, (Match m) {
+				String filename = filenamesPattern.firstMatch(m.group(0))
+					.group(0);
+				filename = filename.replaceAll('"', "");
+				String fileContent;
+				try {
+					final File file = File("assets/css/$filename");
+					fileContent = file.readAsStringSync();
+					StringBuffer sb = StringBuffer();
+					sb.write("<style>");
+					sb.write(fileContent);
+					sb.write("</style>");
+					return sb.toString();
+				} catch (e) {
+					print(e.toString());
+					return errString;
+				}
+			});
+	}
+
+	void runIncludeJS() {
+		_templateContents =
+			_templateContents.replaceAllMapped(includeJSPattern, (Match m) {
+				String filename = filenamesPattern.firstMatch(m.group(0))
+					.group(0);
+				filename = filename.replaceAll('"', "");
+				return '<script src="$filename"></script>';
+			});
+	}
+
+	void runIncludeCSS() {
+		_templateContents =
+			_templateContents.replaceAllMapped(includeCSSPattern, (Match m) {
+				String filename = filenamesPattern.firstMatch(m.group(0))
+					.group(0);
+				filename = filename.replaceAll("\"", "");
+				return '<link rel="stylesheet" type="text/css" href="$filename">';
+			});
+	}
+
 	void appendFile(String filename) {
 		try {
 			final File file = File("$basePath/$filename");
@@ -173,13 +257,15 @@ class Template {
 
 	bool hasReplacers() => replacersPattern.hasMatch(_templateContents);
 
+	bool hasJS() => inlineJSPattern.hasMatch(_templateContents);
+
+	bool hasCSS() => inlineCSSPattern.hasMatch(_templateContents);
+
 	void render() {
-		print(replaceIteratively);
-		replaceIteratively ? replaceIterative() : runReplacers
-		(
-		);
-		runDirectives
-		(
-		);
+		runDirectives();
+		if (replaceIteratively)
+			replaceIterative();
+		else
+			runReplacers();
 	}
 }
