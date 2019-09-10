@@ -8,31 +8,23 @@ abstract class Route {
 class BadRoute implements Route {
 
 	BadRoute(this.request);
+	static Route init(Request request) => BadRoute(request);
 
 	Request request;
 
 	@override
-	Future<Response> getResponse() async {
-		return Response.notFound();
-	}
+	Future<Response> getResponse() async => Response.notFound();
 }
 
 class DeniedRoute implements Route {
+
 	DeniedRoute(this.request);
+	static Route init(Request request) => DeniedRoute(request);
 
 	Request request;
 
 	@override
-	Future<Response> getResponse() async {
-		return Response.forbidden();
-	}
+	Future<Response> getResponse() async => Response.forbidden();
 }
 
-
-Response htmlResponse(String content) {
-	//Shorter & reusable way to set a proper html response
-	//any other changes can be made to the Response object returned from here
-	final Response resp = Response.ok(content);
-	resp.contentType = ContentType.html;
-	return resp;
-}
+Response htmlResponse(String content) => Response.ok(content)..contentType=ContentType.html;

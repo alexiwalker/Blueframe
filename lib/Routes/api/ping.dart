@@ -2,18 +2,13 @@ import 'package:blueframe/Routes/RouteDelegator.dart';
 import 'package:blueframe/blueframe.dart';
 
 class Ping implements Route {
-	@override
 
 	Ping(this.request);
-
-	Future<Response> getResponse() async {
-		return Response.ok("ping");
-	}
+	static Route init(Request request) => Ping(request);
 
 	Request request;
 
+	@override
+	Future<Response> getResponse() async => Response.ok("ping");
 
-	static Route getRoute(Request request) {
-		return Ping(request);
-	}
 }

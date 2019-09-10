@@ -18,9 +18,7 @@ class Template {
 		}
 	}
 
-	String get content {
-		return _templateContents;
-	}
+	String get content => _templateContents;
 
 	Map<String, String> replacers;
 
@@ -43,13 +41,9 @@ class Template {
 	final RegExp includeJSPattern = RegExp(r'({{@linkJS\s\"[A-Za-z0-9.\\\/]+\"}})', caseSensitive: true);
 	final RegExp includeCSSPattern = RegExp(r'({{@linkCSS\s\"[A-Za-z0-9.\\\/]+\"}})', caseSensitive: true);
 
-	void setReplacers(Map<String, String> replacers) {
-		this.replacers = replacers;
-	}
+	void setReplacers(Map<String, String> replacers) => this.replacers = replacers;
 
-	void setViewRoute(String path) {
-		basePath = path;
-	}
+	void setViewRoute(String path) => basePath = path;
 
 	void setTemplate(String template) {
 		this.template = template;

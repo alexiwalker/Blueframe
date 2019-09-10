@@ -2,7 +2,7 @@ import 'package:blueframe/blueframe.dart';
 import 'package:blueframe/template/template.dart';
 import 'RouteDelegator.dart';
 
-class HomeRoute extends Route {
+class HomeRoute implements Route {
 	HomeRoute(this.request);
 
 	Request request;

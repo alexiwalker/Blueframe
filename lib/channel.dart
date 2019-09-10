@@ -26,6 +26,8 @@ class BlueframeChannel extends ApplicationChannel {
 	/// of all [Request]s.
 	///
 	/// This method is invoked after [prepare].
+
+	//todo: convert this to an env variable loaded from some external source depending on whether its running dev or prod
 	bool useMin = false;
 
 	@override
@@ -33,8 +35,7 @@ class BlueframeChannel extends ApplicationChannel {
 		final router = Router();
 		router.route("/assets/*").link(() => FileController("assets/"));
 
-		router.route("/*").linkFunction(
-				(request) => RouteDelegator(request).getRoute().getResponse());
+		router.route("/*").linkFunction((request) => RouteDelegator(request).getRoute().getResponse());
 
 		router.route("*(.ico)").linkFunction(FileHandlers.Ico);
 
