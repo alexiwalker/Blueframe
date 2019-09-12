@@ -1,6 +1,7 @@
 import "dart:io";
 import 'package:blueframe/blueframe.dart';
 
+
 class Template {
 	Template({this.replacers, this.template, basePath, this.replaceIteratively}) {
 		replaceIteratively == null
