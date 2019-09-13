@@ -4,9 +4,8 @@ import 'package:blueframe/blueframe.dart';
 
 class Template {
 	Template({this.replacers, this.template, basePath, this.replaceIteratively}) {
-		replaceIteratively == null
-			? replaceIteratively = false
-			: replaceIteratively;
+		replaceIteratively = replaceIteratively ?? false;
+
 		if (basePath != "")
 			this.basePath += "$basePath\\";
 
@@ -19,6 +18,14 @@ class Template {
 		}
 	}
 
+	Template.fromString(String content, {String basePath,this.replacers, this.replaceIteratively}){
+		_templateContents = content;
+		replaceIteratively = replaceIteratively ?? false;
+		if (basePath != "")
+			this.basePath += "$basePath\\";
+	}
+
+	//_templateContents is private and should only be modified by opening a template file and running replacers/appends, but reading it is fine
 	String get content => _templateContents;
 
 	Map<String, String> replacers;

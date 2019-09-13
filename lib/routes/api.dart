@@ -1,4 +1,4 @@
-import 'package:blueframe/Routes/RouteDelegator.dart';
+import 'package:blueframe/routes/RouteDelegator.dart';
 import 'package:blueframe/blueframe.dart';
 import 'api/ping.dart';
 

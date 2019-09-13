@@ -1,4 +1,4 @@
-import 'package:blueframe/Routes/RouteDelegator.dart';
+import 'package:blueframe/routes/RouteDelegator.dart';
 import 'blueframe.dart';
 import 'support/fileHandlers.dart';
 
