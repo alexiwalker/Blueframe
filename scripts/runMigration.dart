@@ -1,4 +1,4 @@
-import 'migrations/Migration.dart';
+import 'lib/Migration/Migration.dart';
 
 
 void main(List<String> args) async {
