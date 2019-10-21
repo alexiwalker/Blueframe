@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:aqueduct/aqueduct.dart';
 import 'package:blueframe/blueframe.dart';
 
@@ -36,10 +34,9 @@ class Cookie {
 	bool secure = true;
 	int sameSite = SAMESITE_STRICT;
 
-	static const int TIME_SECONDS=0;
-	static const int TIME_MICROSECONDS=1000000;
+	static const int TIME_SECONDS = 0;
+	static const int TIME_MICROSECONDS = 1000000;
 	static const int TIME_MILLISECONDS = 1000;
-
 
 	//Only if good reason
 	static const int SAMESITE_LAX = 0;
@@ -54,28 +51,27 @@ class Cookie {
 	String toString() {
 		final StringBuffer sb = StringBuffer();
 		sb.write("$name=${value.toString()}");
-		
-		if(maxAge != null)
+
+		if (maxAge != null)
 			sb.write(" Max-Age=$maxAge;");
 
-		if(expires != null) {
-			final DateTime expiryDateTime = DateTime.fromMillisecondsSinceEpoch(expires*expiresTimeScale);
+		if (expires != null) {
+			final DateTime expiryDateTime = DateTime.fromMillisecondsSinceEpoch(expires * expiresTimeScale);
 			sb.write(" Expires=${expiryDateTime.toUtc()};");
 		}
-		if(httpOnly)
+		if (httpOnly)
 			sb.write(" HttpOnly;");
 
-		if(secure)
+		if (secure)
 			sb.write(" Secure;");
-
 	}
 
-	void setExpired()=> maxAge=-1;
+	void setExpired() => maxAge = -1;
 
-	void setSecure(bool b)=>secure=b;
+	void setSecure(bool b) => secure = b;
 
-	void setHttpOnly(bool b)=>httpOnly=b;
+	void setHttpOnly(bool b) => httpOnly = b;
 
-	void setMaxAge(int a)=>maxAge=a;
+	void setMaxAge(int a) => maxAge = a;
 
 }

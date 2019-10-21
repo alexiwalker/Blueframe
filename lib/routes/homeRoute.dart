@@ -1,7 +1,8 @@
 import 'package:blueframe/blueframe.dart';
-import 'package:blueframe/template/template.dart';
-import 'RouteDelegator.dart';
 import 'package:blueframe/support/cookies.dart';
+import 'package:blueframe/template/template.dart';
+
+import 'RouteDelegator.dart';
 
 class HomeRoute implements Route {
 	HomeRoute(this.request);
@@ -30,7 +31,6 @@ class HomeRoute implements Route {
 		}
 
 		Map<String, String> cookies = {
-
 		};
 
 		r = Cookies.setCookies(r, cookies);

@@ -1,4 +1,5 @@
 import "dart:io";
+
 import 'package:blueframe/blueframe.dart';
 
 
@@ -18,7 +19,7 @@ class Template {
 		}
 	}
 
-	Template.fromString(String content, {String basePath,this.replacers, this.replaceIteratively}){
+	Template.fromString(String content, {String basePath, this.replacers, this.replaceIteratively}){
 		_templateContents = content;
 		replaceIteratively = replaceIteratively ?? false;
 		if (basePath != "")
