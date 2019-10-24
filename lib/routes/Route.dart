@@ -9,6 +9,7 @@ abstract class Route {
 class BadRoute implements Route {
 
 	BadRoute(this.request);
+
 	static Route init(Request request) => BadRoute(request);
 
 	Request request;
@@ -20,6 +21,7 @@ class BadRoute implements Route {
 class DeniedRoute implements Route {
 
 	DeniedRoute(this.request);
+
 	static Route init(Request request) => DeniedRoute(request);
 
 	Request request;
@@ -28,4 +30,6 @@ class DeniedRoute implements Route {
 	Future<Response> getResponse() async => Response.forbidden();
 }
 
-Response htmlResponse(String content) => Response.ok(content)..contentType=ContentType.html;
+Response htmlResponse(String content) =>
+	Response.ok(content)
+		..contentType = ContentType.html;

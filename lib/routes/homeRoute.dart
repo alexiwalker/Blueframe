@@ -1,5 +1,7 @@
 import 'package:blueframe/blueframe.dart';
+import 'package:blueframe/support/cookies.dart';
 import 'package:blueframe/template/template.dart';
+
 import 'RouteDelegator.dart';
 
 class HomeRoute implements Route {
@@ -15,6 +17,7 @@ class HomeRoute implements Route {
 			"CONDA":"true"
 		};
 
+//		print(request.raw);
 		final Template template = Template(
 			template: "home.dhml",
 			replacers: map,
@@ -22,6 +25,18 @@ class HomeRoute implements Route {
 		)
 			..render();
 
-		return htmlResponse(template.content);
+		var r = htmlResponse(template.content);
+
+		for (var cookie in request.raw.cookies) {
+			print(cookie.name);
+			print(cookie.value);
+		}
+
+		Map<String, String> cookies = {
+		};
+
+		r = Cookies.setCookies(r, cookies);
+
+		return r;
 	}
 }
