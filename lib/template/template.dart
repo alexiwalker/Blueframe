@@ -18,7 +18,7 @@ class Template {
 		}
 	}
 
-	Template.fromString(String content, {String basePath,this.replacers, this.replaceIteratively}){
+	Template.fromString(String content, {String basePath, this.replacers, this.replaceIteratively}){
 		_templateContents = content;
 		replaceIteratively = replaceIteratively ?? false;
 		if (basePath != "")
@@ -28,7 +28,7 @@ class Template {
 	//_templateContents is private and should only be modified by opening a template file and running replacers/appends, but reading it is fine
 	String get content => _templateContents;
 
-	Map<String, String> replacers;
+	Map<String, dynamic> replacers;
 
 	String template;
 	String _templateContents;
@@ -38,6 +38,8 @@ class Template {
 
 	List<String> includedFiles = [];
 
+
+	final RegExp conditionalPattern = RegExp(r'({{@if\s*?\[([A-z]*?)\]\s*?\(([^){]*?)\)\s*?else\s*?\(([^)]*?)\)}})', caseSensitive: true);
 	final RegExp includePattern = RegExp(r'({{@include\s\"[A-Za-z0-9.\\\/]+\"}})', caseSensitive: true);
 	final RegExp includeOncePattern = RegExp(r'({{@includeonce\s\"[A-Za-z0-9.\\\/]+\"}})', caseSensitive: true);
 	final RegExp replacersPattern = RegExp(r'(\[\[[A-Za-z0-9]+]\])', caseSensitive: true);
@@ -73,7 +75,7 @@ class Template {
 	void runReplacers() {
 		for (var pair in replacers.entries) {
 			final String key = pair.key;
-			final String content = pair.value;
+			final String content = pair.value.toString();
 			final String formatter = "(\\[\\[$key\\]\\])";
 			_templateContents = _templateContents.replaceAllMapped(
 				RegExp(formatter, caseSensitive: false), (Match m) => content);
@@ -90,7 +92,7 @@ class Template {
 			start = _templateContents;
 			for (var pair in replacers.entries) {
 				final String key = pair.key;
-				final String content = pair.value;
+				final String content = pair.value.toString();
 				final String formatter = "(\\[\\[$key\\]\\])";
 				_templateContents = _templateContents.replaceAllMapped(
 					RegExp(formatter, caseSensitive: false), (Match m) => content);
@@ -110,6 +112,7 @@ class Template {
 	/// Directives are denoted by {{}} in the .dtp file
 	///
 	void runDirectives() {
+		runConditional();
 		runIncludes();
 		runIncludeOnce();
 		runInlineJS();
@@ -118,6 +121,19 @@ class Template {
 		runIncludeJS();
 	}
 
+	///
+	/// Format: {{if [VARNAME] (conditional) else (otherwise)}} 
+	/// 
+	void runConditional() {
+		while(hasConditionals()){
+			_templateContents =
+				_templateContents.replaceAllMapped(conditionalPattern, (Match m) {
+					print(m.group(1));
+						bool key = replacers[m.group(2)].toString()=="true";
+						return key?m.group(3):m.group(4);
+				});
+		}
+	}
 
 	///
 	/// Format: {{@include "filename.js"}}
@@ -140,6 +156,9 @@ class Template {
 					return fileContent;
 				});
 		}
+
+		//incase included files contain a conditional content
+		runConditional();
 	}
 
 	///
@@ -254,6 +273,7 @@ class Template {
 	}
 
 	bool hasIncludes() => includePattern.hasMatch(_templateContents);
+	bool hasConditionals() => conditionalPattern.hasMatch(_templateContents);
 
 	bool hasIncludeOnce() => includeOncePattern.hasMatch(_templateContents);
 

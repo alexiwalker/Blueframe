@@ -39,7 +39,7 @@ class BlueframeChannel extends ApplicationChannel {
 
 		router.route("*(.ico)").linkFunction(FileHandlers.Ico);
 
-		//if dev, use non minified JS for debugging. Use JsMin for prod
+//		if dev, use non minified JS for debugging. Use JsMin for prod
 		if (useMin)
 			router.route("*(.js)").linkFunction(FileHandlers.JsMin);
 		else

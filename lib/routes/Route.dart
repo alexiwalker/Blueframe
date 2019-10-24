@@ -1,4 +1,5 @@
 import "package:blueframe/blueframe.dart";
+import 'package:blueframe/template/template.dart';
 
 //this just exists so that I know every route can give me a response
 abstract class Route {

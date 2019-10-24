@@ -9,8 +9,10 @@ class HomeRoute implements Route {
 
 	@override
 	Future<Response> getResponse() async {
-		final Map<String, String> map = {
-			"BODY": "<p>Hello there</p>"
+		final Map<String, dynamic> map = {
+			"BODY": "<p>Hello there</p>",
+//			"CONDB":"true",
+			"CONDA":"true"
 		};
 
 		final Template template = Template(
